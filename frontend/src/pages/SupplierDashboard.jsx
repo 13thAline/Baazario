@@ -127,7 +127,7 @@ const SupplierDashboard = () => {
                   >
                     <FiTrash2 size={16} />
                   </button>
-                  <img src={`http://localhost:5000${item.imageUrl}`} alt={item.name} className="w-full h-32 object-cover" />
+                  <img src={`${import.meta.env.VITE_API_URL}${item.imageUrl}`} alt={item.name} className="w-full h-32 object-cover" />
                   <div className="p-4">
                     <h4 className="font-bold text-gray-800">{item.name}</h4>
                     <p className="text-sm text-gray-600">{item.quantity}</p>
