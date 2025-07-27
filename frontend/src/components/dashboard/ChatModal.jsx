@@ -4,7 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import io from 'socket.io-client';
 import { FiX, FiSend } from 'react-icons/fi';
 
-const socket = io(`${import.meta.env.VITE_API_URL}`);
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const socket = io(API_URL);
 
 const ChatModal = ({ order, onClose }) => {
     const { user } = useAuth();
