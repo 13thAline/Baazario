@@ -2,6 +2,7 @@ import React from 'react';
 import { FaInstagram, FaGithub, FaTwitter } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useLoading } from '../context/LoadingContext';
+import { Link as ScrollLink } from 'react-scroll';
 import logo from '../assets/Ellipse-1.png';
 
 const Footer = () => {
@@ -34,8 +35,15 @@ const Footer = () => {
             <div>
               <h3 className="text-sm font-bold tracking-wider uppercase">Product</h3>
               <ul className="mt-4 space-y-2">
-                <li><button onClick={() => handleNavigate('/')} className="text-sm hover:underline">Features</button></li>
-                <li><button onClick={() => handleNavigate('/pricing')} className="text-sm hover:underline">Pricing</button></li>
+                <li><ScrollLink
+                                to="features"
+                                smooth={true}
+                                duration={500}
+                                offset={-80}
+                                className="text-sm hover:underline cursor-pointer"
+                              >
+                                Features
+                              </ScrollLink></li>
                 <li><button onClick={() => handleNavigate('/api-docs')} className="text-sm hover:underline">API</button></li>
               </ul>
             </div>
@@ -53,13 +61,13 @@ const Footer = () => {
         <div className="mt-8 border-t border-stone-300 pt-8 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-sm text-gray-600">&copy; 2025 Baazario. All rights reserved.</p>
           <div className="flex items-center space-x-4 mt-4 sm:mt-0">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-800">
+            <a href="https://www.instagram.com/_not_the_real_sailen/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-800">
               <FaInstagram size={20} />
             </a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-800">
+            <a href="https://github.com/13thAline/Baazario" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-800">
               <FaGithub size={20} />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-800">
+            <a href="https://x.com/Aline_of_Aliens" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-800">
               <FaTwitter size={20} />
             </a>
           </div>

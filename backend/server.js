@@ -53,6 +53,7 @@ app.use('/api/profile', require('./routes/profile'));
 app.use('/api/catalog', require('./routes/catalog'));
 app.use('/api/groups', require('./routes/groups'));
 app.use('/api/group-orders', require('./routes/groupOrders'));
+app.use('/api/contact', require('./routes/contact'));
 
 // Set up Socket.IO connection logic
 io.on('connection', (socket) => {
