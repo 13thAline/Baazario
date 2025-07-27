@@ -16,9 +16,8 @@ const server = http.createServer(app);
 
 // CORS configuration to allow both your Vercel frontend and local development
 const allowedOrigins = [
-  "https://baazario-final.vercel.app",
   "http://localhost:5173",
-   // Your live Vercel URL
+  "https://baazario-final.vercel.app" // Your live Vercel URL
 ];
 
 const corsOptions = {
@@ -30,7 +29,8 @@ const corsOptions = {
       return callback(new Error(msg), false);
     }
     return callback(null, true);
-  }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"]
 };
 
 const io = new Server(server, {
