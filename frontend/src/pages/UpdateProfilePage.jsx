@@ -18,7 +18,7 @@ const UpdateProfilePage = () => {
       if (token) {
         try {
           const config = { headers: { 'x-auth-token': token } };
-          const res = await axios.get('http://localhost:5000/api/profile/me', config);
+          const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/profile/me`, config);
           setFormData(prev => ({ ...prev, ...res.data }));
         } catch (err) {
           console.error('Could not fetch profile', err);
@@ -34,7 +34,7 @@ const UpdateProfilePage = () => {
     e.preventDefault();
     try {
       const config = { headers: { 'Content-Type': 'application/json', 'x-auth-token': token } };
-      const res = await axios.put('http://localhost:5000/api/profile', formData, config);
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/profile`, formData, config);
       alert(res.data.msg);
     } catch (err) {
       alert('Profile update failed');

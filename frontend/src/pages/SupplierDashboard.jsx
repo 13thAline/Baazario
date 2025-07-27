@@ -19,7 +19,7 @@ const SupplierDashboard = () => {
       if (token) {
         try {
           const config = { headers: { 'x-auth-token': token } };
-          const res = await axios.get('http://localhost:5000/api/catalog/my-items', config);
+          const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/my-items`, config);
           setCatalogItems(res.data);
         } catch (err) {
           console.error("Could not fetch catalog items", err);
@@ -38,7 +38,7 @@ const SupplierDashboard = () => {
 
     try {
       const config = { headers: { 'x-auth-token': token } };
-      const res = await axios.post('http://localhost:5000/api/catalog', formData, config);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/catalog`, formData, config);
       setCatalogItems([res.data, ...catalogItems]);
       
       // Reset form fields
@@ -56,7 +56,7 @@ const SupplierDashboard = () => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
         const config = { headers: { 'x-auth-token': token } };
-        await axios.delete(`http://localhost:5000/api/catalog/${itemId}`, config);
+        await axios.delete(`${import.meta.env.VITE_API_URL}/api/catalog/${itemId}`, config);
         setCatalogItems(catalogItems.filter(item => item._id !== itemId));
       } catch (err) {
         alert('Failed to delete item');

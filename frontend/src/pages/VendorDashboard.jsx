@@ -15,7 +15,7 @@ const CreateGroupModal = ({ onClose, token, onGroupCreated }) => {
         const inviteeEmails = emails.split(',').map(email => email.trim()).filter(email => email);
         try {
             const config = { headers: { 'Content-Type': 'application/json', 'x-auth-token': token } };
-            await axios.post('http://localhost:5000/api/groups', { name, inviteeEmails }, config);
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/groups`, { name, inviteeEmails }, config);
             alert('Group created successfully!');
             onGroupCreated();
             onClose();
@@ -61,7 +61,7 @@ const StartOrderModal = ({ item, myGroups, token, onClose, onOrderCreated }) => 
         try {
             const config = { headers: { 'Content-Type': 'application/json', 'x-auth-token': token } };
             const body = { groupId: selectedGroup, catalogItemId: item._id, maxQuantityPerMember: maxQuantity };
-            await axios.post('http://localhost:5000/api/group-orders', body, config);
+            const orderRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group-orders/group/${group._id}`, config);
             alert('Group order started!');
             onOrderCreated();
             onClose();
@@ -107,9 +107,9 @@ const VendorDashboard = () => {
             const config = { headers: { 'x-auth-token': token } };
             try {
                 const [catalogRes, invitesRes, groupsRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/catalog/all', config),
-                    axios.get('http://localhost:5000/api/groups/invitations', config),
-                    axios.get('http://localhost:5000/api/groups/my-groups', config)
+                    axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/all`, config),
+                    axios.get(`${import.meta.env.VITE_API_URL}/api/groups/invitations`, config),
+                    axios.get(`${import.meta.env.VITE_API_URL}/api/groups/my-groups`, config)
                 ]);
 
                 let ordersData = {};
@@ -128,7 +128,7 @@ const VendorDashboard = () => {
     const handleAcceptInvite = async (inviteId) => {
         try {
             const config = { headers: { 'x-auth-token': token } };
-            await axios.post(`http://localhost:5000/api/groups/invitations/${inviteId}/accept`, {}, config);
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/groups/invitations/${inviteId}/accept`, {}, config);
             alert('Invitation accepted!');
             fetchData();
         } catch (err) { alert('Failed to accept invitation'); }
@@ -137,7 +137,7 @@ const VendorDashboard = () => {
     const handleCommit = async (orderId, quantity) => {
         try {
             const config = { headers: { 'x-auth-token': token } };
-            await axios.post(`http://localhost:5000/api/group-orders/${orderId}/commit`, { quantity }, config);
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/group-orders/${orderId}/commit`, { quantity }, config);
             alert('Commitment saved!');
             fetchData();
         } catch (err) { alert(err.response?.data?.msg || 'Failed to save commitment'); }
