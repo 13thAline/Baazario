@@ -14,18 +14,20 @@ const SupplierDashboard = () => {
   const [quantity, setQuantity] = useState('');
   const [imageFile, setImageFile] = useState(null);
 
-  useEffect(() => {
-    const fetchCatalogItems = async () => {
-      if (token) {
-        try {
-          const config = { headers: { 'x-auth-token': token } };
-          const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/my-items`, config);
-          setCatalogItems(res.data);
-        } catch (err) {
-          console.error("Could not fetch catalog items", err);
-        }
+  const fetchCatalogItems = async () => {
+    if (token) {
+      try {
+        const config = { headers: { 'x-auth-token': token } };
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/my-items`, config);
+        setCatalogItems(res.data || []); // Fallback to empty array if data is null
+      } catch (err) {
+        console.error("Could not fetch catalog items", err);
+        setCatalogItems([]); // Set to empty array on error to prevent crash
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchCatalogItems();
   }, [token]);
 
@@ -67,7 +69,7 @@ const SupplierDashboard = () => {
 
   const stats = [
     { title: 'Vendor Groups', value: '0', description: 'Active groups', icon: <FiUsers size={20} /> },
-    { title: 'Suppliers', value: '0', description: 'Available suppliers', icon: <FiArchive size={20} /> },
+    { title: 'My Items', value: catalogItems.length, description: 'Items in catalog', icon: <FiArchive size={20} /> },
     { title: 'Orders', value: '0', description: 'Coming in Phase 2', icon: <FiBox size={20} /> },
   ];
 
