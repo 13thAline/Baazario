@@ -38,8 +38,14 @@ router.post('/', auth, async (req, res) => {
 router.get('/group/:groupId', auth, async (req, res) => {
     try {
         const orders = await GroupOrder.find({ group: req.params.groupId, status: 'open' })
-            .populate('catalogItem')
-            .populate('commitments.member', 'name');
+          .populate({
+            path: 'catalogItem',
+            model: 'CatalogItem' // Explicitly tell Mongoose which model to use
+          })
+          .populate({
+            path: 'commitments.member',
+            select: 'name' // Only select the 'name' field
+          });
         res.json(orders);
     } catch (err) {
         console.error(err.message);
