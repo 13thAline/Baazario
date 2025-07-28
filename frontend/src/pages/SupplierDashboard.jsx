@@ -9,7 +9,6 @@ const SupplierDashboard = () => {
   const [catalogItems, setCatalogItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
   
-  // State for form fields
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [imageFile, setImageFile] = useState(null);
@@ -19,10 +18,10 @@ const SupplierDashboard = () => {
       try {
         const config = { headers: { 'x-auth-token': token } };
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/my-items`, config);
-        setCatalogItems(res.data || []); // Fallback to empty array if data is null
+        setCatalogItems(res.data || []);
       } catch (err) {
         console.error("Could not fetch catalog items", err);
-        setCatalogItems([]); // Set to empty array on error to prevent crash
+        setCatalogItems([]);
       }
     }
   };
@@ -43,7 +42,6 @@ const SupplierDashboard = () => {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/catalog`, formData, config);
       setCatalogItems([res.data, ...catalogItems]);
       
-      // Reset form fields
       setName('');
       setQuantity('');
       setImageFile(null);
@@ -75,12 +73,10 @@ const SupplierDashboard = () => {
 
   return (
     <div className="space-y-8">
-      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, index) => <StatCard key={index} {...stat} />)}
       </div>
 
-      {/* My Catalog Section */}
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex items-center justify-between">
           <div>
@@ -120,7 +116,7 @@ const SupplierDashboard = () => {
             <div className="text-center py-16"><p className="text-gray-500">Your catalog is empty. Add your first item!</p></div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-6">
-              {catalogItems.map(item => (
+              {catalogItems.map(item => item && (
                 <div key={item._id} className="border rounded-lg overflow-hidden shadow-sm relative group">
                   <button 
                     onClick={() => handleDeleteItem(item._id)}

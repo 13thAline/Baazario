@@ -106,7 +106,6 @@ const VendorDashboard = () => {
         if (token) {
             const config = { headers: { 'x-auth-token': token } };
             try {
-                // Ensure all API endpoints are correct
                 const [catalogRes, invitesRes, groupsRes] = await Promise.all([
                     axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/all`, config),
                     axios.get(`${import.meta.env.VITE_API_URL}/api/groups/invitations`, config),
@@ -114,7 +113,6 @@ const VendorDashboard = () => {
                 ]);
 
                 let ordersData = {};
-                // Add checks to make sure the data exists before looping
                 if (groupsRes.data && Array.isArray(groupsRes.data)) {
                     for (const group of groupsRes.data) {
                         if (group?._id) {
@@ -124,7 +122,6 @@ const VendorDashboard = () => {
                     }
                 }
                 
-                // Set state with fallbacks to empty arrays to prevent crashes
                 setData({
                     catalog: catalogRes.data || [],
                     invites: invitesRes.data || [],
@@ -133,7 +130,6 @@ const VendorDashboard = () => {
                 });
             } catch (err) { 
                 console.error("Could not fetch dashboard data. Check API responses and URLs.", err); 
-                // If an error occurs, set all data to empty arrays to prevent a crash
                 setData({ catalog: [], invites: [], groups: [], orders: {} });
             }
         }
@@ -159,7 +155,7 @@ const VendorDashboard = () => {
         } catch (err) { alert(err.response?.data?.msg || 'Failed to save commitment'); }
     };
 
-    const leaderGroups = data.groups.filter(g => g.leader._id === user?.id);
+    const leaderGroups = data.groups.filter(g => g?.leader?._id === user?.id);
 
     const stats = [
         { title: 'Vendor Groups', value: data.groups.length, description: 'Active groups', icon: <FiUsers size={20} /> },
@@ -196,7 +192,7 @@ const VendorDashboard = () => {
                      <div className="mt-4 space-y-3">
                         {data.invites.map(invite => (
                             <div key={invite._id} className="p-3 bg-gray-100 rounded-md flex items-center justify-between flex-wrap gap-2">
-                                <p className="text-sm">You have been invited to join <strong>{invite.group.name}</strong> by <strong>{invite.sender.name}</strong>.</p>
+                                <p className="text-sm">You have been invited to join <strong>{invite.group?.name}</strong> by <strong>{invite.sender?.name}</strong>.</p>
                                 <button onClick={() => handleAcceptInvite(invite._id)} className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-md hover:bg-green-600">Accept</button>
                             </div>
                         ))}
@@ -211,28 +207,28 @@ const VendorDashboard = () => {
                         <p className="text-sm text-gray-500">You have not joined any groups yet.</p>
                     ) : (
                         <div className="space-y-6">
-                            {data.groups.map(group => (
+                            {data.groups.map(group => group && (
                                 <div key={group._id} className="p-4 bg-gray-50 rounded-lg">
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <h4 className="font-bold text-gray-900">{group.name}</h4>
-                                            <p className="text-xs text-gray-500">Leader: {group.leader.name}</p>
+                                            <p className="text-xs text-gray-500">Leader: {group.leader?.name}</p>
                                         </div>
                                         <div>
                                             <h5 className="text-sm font-semibold text-right">Members:</h5>
                                             <ul className="text-sm text-gray-600 text-right">
-                                                {group.members.map(member => <li key={member._id}>{member.name}</li>)}
+                                                {group.members?.map(member => member && <li key={member._id}>{member.name}</li>)}
                                             </ul>
                                         </div>
                                     </div>
                                     <div className="mt-4 border-t pt-4">
                                         <h5 className="text-sm font-semibold mb-2">Active Group Orders:</h5>
-                                        {data.orders[group._id]?.length > 0 ? data.orders[group._id].map(order => (
+                                        {data.orders[group._id]?.length > 0 ? data.orders[group._id].map(order => order && (
                                             <div key={order._id} className="p-3 mt-2 bg-white rounded-md border">
                                                 <div className="flex items-center space-x-4">
-                                                    <img src={`${import.meta.env.VITE_API_URL}${order.catalogItem.imageUrl}`} alt={order.catalogItem.name} className="w-16 h-16 rounded-md object-cover"/>
+                                                    <img src={`${import.meta.env.VITE_API_URL}${order.catalogItem?.imageUrl}`} alt={order.catalogItem?.name} className="w-16 h-16 rounded-md object-cover"/>
                                                     <div>
-                                                        <p className="font-semibold">{order.catalogItem.name} ({order.catalogItem.quantity})</p>
+                                                        <p className="font-semibold">{order.catalogItem?.name} ({order.catalogItem?.quantity})</p>
                                                         <p className="text-xs text-gray-500">Max per member: {order.maxQuantityPerMember}</p>
                                                     </div>
                                                 </div>
@@ -241,9 +237,9 @@ const VendorDashboard = () => {
                                                     <button type="submit" className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Commit</button>
                                                 </form>
                                                 <details className="mt-2 text-xs">
-                                                    <summary className="cursor-pointer font-semibold">See Commitments ({order.commitments.length})</summary>
+                                                    <summary className="cursor-pointer font-semibold">See Commitments ({order.commitments?.length || 0})</summary>
                                                     <ul className="text-gray-500 mt-1 pl-4">
-                                                        {order.commitments.map(c => <li key={c.member._id}>{c.member.name}: {c.quantity}</li>)}
+                                                        {order.commitments?.map(c => c && <li key={c.member?._id}>{c.member?.name}: {c.quantity}</li>)}
                                                     </ul>
                                                 </details>
                                                 {user?.id === order.leader && (
@@ -272,13 +268,13 @@ const VendorDashboard = () => {
                         <div className="text-center py-16"><p className="text-gray-500">No items available in the marketplace yet.</p></div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-6">
-                            {data.catalog.map(item => (
+                            {data.catalog.map(item => item && (
                                 <div key={item._id} className="border rounded-lg overflow-hidden shadow-sm flex flex-col">
                                     <img src={`${import.meta.env.VITE_API_URL}${item.imageUrl}`} alt={item.name} className="w-full h-32 object-cover" />
                                     <div className="p-4 flex-grow flex flex-col">
                                         <h4 className="font-bold text-gray-800">{item.name}</h4>
                                         <p className="text-sm text-gray-600">{item.quantity}</p>
-                                        <p className="text-xs text-gray-500 mt-2">Sold by: {item.supplier.name}</p>
+                                        <p className="text-xs text-gray-500 mt-2">Sold by: {item.supplier?.name}</p>
                                         {leaderGroups.length > 0 && 
                                             <button onClick={() => setModal({...modal, startOrder: item})} className="mt-3 w-full text-xs bg-gray-800 text-white py-2 rounded-md hover:bg-black transition-colors flex items-center justify-center space-x-2">
                                                 <FiShoppingCart />
