@@ -61,7 +61,7 @@ const StartOrderModal = ({ item, myGroups, token, onClose, onOrderCreated }) => 
         try {
             const config = { headers: { 'Content-Type': 'application/json', 'x-auth-token': token } };
             const body = { groupId: selectedGroup, catalogItemId: item._id, maxQuantityPerMember: maxQuantity };
-            const orderRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group-orders/group/${group._id}`, config);
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/group-orders`, body, config);
             alert('Group order started!');
             onOrderCreated();
             onClose();
@@ -114,7 +114,7 @@ const VendorDashboard = () => {
 
                 let ordersData = {};
                 for (const group of groupsRes.data) {
-                    const orderRes = await axios.get(`http://localhost:5000/api/group-orders/group/${group._id}`, config);
+                    const orderRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group-orders/group/${group._id}`, config);
                     ordersData[group._id] = orderRes.data;
                 }
                 
@@ -123,39 +123,7 @@ const VendorDashboard = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            // Check if the token exists before making any requests
-            if (token) {
-                // This config object with the headers is crucial
-                const config = {
-                    headers: {
-                        'x-auth-token': token
-                    }
-                };
-                
-                try {
-                    const [catalogRes, invitesRes, groupsRes] = await Promise.all([
-                        axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/all`, config),
-                        axios.get(`${import.meta.env.VITE_API_URL}/api/groups/invitations`, config),
-                        axios.get(`${import.meta.env.VITE_API_URL}/api/groups/my-groups`, config)
-                    ]);
-
-                    let ordersData = {};
-                    for (const group of groupsRes.data) {
-                        // Make sure the config is passed here too
-                        const orderRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group-orders/group/${group._id}`, config);
-                        ordersData[group._id] = orderRes.data;
-                    }
-                    
-                    setData({ catalog: catalogRes.data, invites: invitesRes.data, groups: groupsRes.data, orders: ordersData });
-                } catch (err) { 
-                    console.error("Could not fetch dashboard data. Is the auth token valid?", err); 
-                }
-            }
-        };
-        fetchData();
-    }, [token]);
+    useEffect(() => { fetchData(); }, [token]);
 
     const handleAcceptInvite = async (inviteId) => {
         try {
@@ -246,7 +214,7 @@ const VendorDashboard = () => {
                                         {data.orders[group._id]?.length > 0 ? data.orders[group._id].map(order => (
                                             <div key={order._id} className="p-3 mt-2 bg-white rounded-md border">
                                                 <div className="flex items-center space-x-4">
-                                                    <img src={`http://localhost:5000${order.catalogItem.imageUrl}`} alt={order.catalogItem.name} className="w-16 h-16 rounded-md object-cover"/>
+                                                    <img src={`${import.meta.env.VITE_API_URL}${order.catalogItem.imageUrl}`} alt={order.catalogItem.name} className="w-16 h-16 rounded-md object-cover"/>
                                                     <div>
                                                         <p className="font-semibold">{order.catalogItem.name} ({order.catalogItem.quantity})</p>
                                                         <p className="text-xs text-gray-500">Max per member: {order.maxQuantityPerMember}</p>
@@ -290,7 +258,7 @@ const VendorDashboard = () => {
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-6">
                             {data.catalog.map(item => (
                                 <div key={item._id} className="border rounded-lg overflow-hidden shadow-sm flex flex-col">
-                                    <img src={`http://localhost:5000${item.imageUrl}`} alt={item.name} className="w-full h-32 object-cover" />
+                                    <img src={`${import.meta.env.VITE_API_URL}${item.imageUrl}`} alt={item.name} className="w-full h-32 object-cover" />
                                     <div className="p-4 flex-grow flex flex-col">
                                         <h4 className="font-bold text-gray-800">{item.name}</h4>
                                         <p className="text-sm text-gray-600">{item.quantity}</p>
