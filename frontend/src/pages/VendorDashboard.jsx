@@ -106,6 +106,7 @@ const VendorDashboard = () => {
         if (token) {
             const config = { headers: { 'x-auth-token': token } };
             try {
+                // Ensure all API endpoints are correct
                 const [catalogRes, invitesRes, groupsRes] = await Promise.all([
                     axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/all`, config),
                     axios.get(`${import.meta.env.VITE_API_URL}/api/groups/invitations`, config),
@@ -113,13 +114,28 @@ const VendorDashboard = () => {
                 ]);
 
                 let ordersData = {};
-                for (const group of groupsRes.data) {
-                    const orderRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group-orders/group/${group._id}`, config);
-                    ordersData[group._id] = orderRes.data;
+                // Add checks to make sure the data exists before looping
+                if (groupsRes.data && Array.isArray(groupsRes.data)) {
+                    for (const group of groupsRes.data) {
+                        if (group?._id) {
+                            const orderRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group-orders/group/${group._id}`, config);
+                            ordersData[group._id] = orderRes.data || [];
+                        }
+                    }
                 }
                 
-                setData({ catalog: catalogRes.data, invites: invitesRes.data, groups: groupsRes.data, orders: ordersData });
-            } catch (err) { console.error("Could not fetch dashboard data", err); }
+                // Set state with fallbacks to empty arrays to prevent crashes
+                setData({
+                    catalog: catalogRes.data || [],
+                    invites: invitesRes.data || [],
+                    groups: groupsRes.data || [],
+                    orders: ordersData
+                });
+            } catch (err) { 
+                console.error("Could not fetch dashboard data. Check API responses and URLs.", err); 
+                // If an error occurs, set all data to empty arrays to prevent a crash
+                setData({ catalog: [], invites: [], groups: [], orders: {} });
+            }
         }
     };
 
