@@ -123,7 +123,39 @@ const VendorDashboard = () => {
         }
     };
 
-    useEffect(() => { fetchData(); }, [token]);
+    useEffect(() => {
+        const fetchData = async () => {
+            // Check if the token exists before making any requests
+            if (token) {
+                // This config object with the headers is crucial
+                const config = {
+                    headers: {
+                        'x-auth-token': token
+                    }
+                };
+                
+                try {
+                    const [catalogRes, invitesRes, groupsRes] = await Promise.all([
+                        axios.get(`${import.meta.env.VITE_API_URL}/api/catalog/all`, config),
+                        axios.get(`${import.meta.env.VITE_API_URL}/api/groups/invitations`, config),
+                        axios.get(`${import.meta.env.VITE_API_URL}/api/groups/my-groups`, config)
+                    ]);
+
+                    let ordersData = {};
+                    for (const group of groupsRes.data) {
+                        // Make sure the config is passed here too
+                        const orderRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group-orders/group/${group._id}`, config);
+                        ordersData[group._id] = orderRes.data;
+                    }
+                    
+                    setData({ catalog: catalogRes.data, invites: invitesRes.data, groups: groupsRes.data, orders: ordersData });
+                } catch (err) { 
+                    console.error("Could not fetch dashboard data. Is the auth token valid?", err); 
+                }
+            }
+        };
+        fetchData();
+    }, [token]);
 
     const handleAcceptInvite = async (inviteId) => {
         try {
